@@ -1,8 +1,11 @@
 - vendor: Nokia
   before: ""
   after: |
-    hostname "test"
+    system {
+        name "test"
+    }
   patch: |
     configure private
-    /configure hostname "test"
+    /configure system name "test"
     commit
+    quit-config

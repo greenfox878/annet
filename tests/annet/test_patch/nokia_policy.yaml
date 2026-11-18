@@ -1,0 +1,46 @@
+# inserting a policy entry does not touch the other entries: MD-CLI orders them by the key
+- vendor: Nokia
+  before: |
+    policy-options {
+        policy-statement "export" {
+            entry 10 {
+                action {
+                    action-type accept
+                }
+            }
+            entry 30 {
+                action {
+                    action-type reject
+                }
+            }
+        }
+    }
+  after: |
+    policy-options {
+        policy-statement "export" {
+            entry 10 {
+                action {
+                    action-type accept
+                }
+            }
+            entry 20 {
+                from {
+                    prefix-list ["pl"]
+                }
+                action {
+                    action-type accept
+                }
+            }
+            entry 30 {
+                action {
+                    action-type reject
+                }
+            }
+        }
+    }
+  patch: |
+    configure private
+    /configure policy-options policy-statement "export" entry 20 from prefix-list ["pl"]
+    /configure policy-options policy-statement "export" entry 20 action action-type accept
+    commit
+    quit-config

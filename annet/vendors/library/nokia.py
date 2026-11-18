@@ -18,7 +18,8 @@ class NokiaVendor(AbstractVendor):
 
         before.add_cmd(Command("configure private"))
         if do_commit:
-            after.add_cmd(Command("commit"))
+            after.add_cmd(Command("commit", timeout=30, read_timeout=30))
+        after.add_cmd(Command("quit-config"))
 
         return before, after
 
@@ -41,4 +42,4 @@ class NokiaVendor(AbstractVendor):
         return ""
 
     def diff(self, order: bool) -> str:
-        return "annet.rulebook.juniper.ordered_diff" if order else "annet.rulebook.juniper.default_diff"
+        return "annet.rulebook.nokia.ordered_diff" if order else "annet.rulebook.nokia.default_diff"

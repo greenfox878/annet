@@ -193,7 +193,11 @@ hw.NVIDIA.SN5600
 hw.Nebius
 hw.Nebius.Octoport
 hw.Nokia
+hw.Nokia.NS7210
+hw.Nokia.NS7250
+hw.Nokia.NS7450
 hw.Nokia.NS7750
+hw.Nokia.NS7950
 hw.Nokia.SR_1s
 hw.Opengear
 hw.Opengear.CM8100
@@ -893,10 +897,26 @@ class Juniper_VRR(HardwareLeaf):
     ...
 
 class Nokia(HardwareLeaf):
+    NS7210: Nokia_NS7210
+    NS7250: Nokia_NS7250
+    NS7450: Nokia_NS7450
     NS7750: Nokia_NS7750
+    NS7950: Nokia_NS7950
     SR_1s: Nokia_SR_1s
 
+class Nokia_NS7210(HardwareLeaf):
+    ...
+
+class Nokia_NS7250(HardwareLeaf):
+    ...
+
+class Nokia_NS7450(HardwareLeaf):
+    ...
+
 class Nokia_NS7750(HardwareLeaf):
+    ...
+
+class Nokia_NS7950(HardwareLeaf):
     ...
 
 class Nokia_SR_1s(HardwareLeaf):

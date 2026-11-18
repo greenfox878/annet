@@ -18,10 +18,10 @@ system
     time
         ~
 
+# MD-CLI lists are keyed (e.g. "entry 10"), so their order is defined by the keys, not by the position
 policy-options
     policy-statement *
-        ~       %ordered
-            ~   %global
+        ~       %global
 
 
 router *

@@ -759,18 +759,12 @@ class NokiaFormatter(JuniperFormatter):
                     commands[k] = v
             else:
                 if key.startswith("delete"):
-                    cmd = " ".join((self.patch_set_prefix, "delete", *_prev, key.replace("delete", "", 1).strip()))
+                    # MD-CLI: delete is a command taking an absolute path - "delete /configure <path>"
+                    cmd = " ".join(("delete", self.patch_set_prefix, *_prev, key.replace("delete", "", 1).strip()))
                 else:
                     cmd = " ".join((self.patch_set_prefix, *_prev, key.strip()))
-                # Expanding [ a b c ] junipers list of arguments
-                matches = re.search(r"^(.*)\s+\[(.+)\]$", cmd)
-                if matches:
-                    for c in matches.group(2).split(" "):
-                        if c.strip():
-                            cmd = " ".join([matches.group(1), c])
-                            commands[(cmd,)] = context
-                else:
-                    commands[(cmd,)] = context
+                # MD-CLI accepts leaf-lists as is: policy ["a" "b"]
+                commands[(cmd,)] = context
         return commands
 
 

@@ -120,6 +120,10 @@
 
     "Nokia": "^[Nn]okia",
     "Nokia.NS7750": " 7750",
+    "Nokia.NS7250": " 7250",
+    "Nokia.NS7450": " 7450",
+    "Nokia.NS7950": " 7950",
+    "Nokia.NS7210": " 7210",
     "Nokia.SR_1s": "SR-1s",
 
     "PC": "^(PC|pc|[Mm]ellanox SN|[Ee]dge-?[Cc]ore|[Mm]oxa|NVIDIA|Nebius|[Aa]sterfusion CX|[Uu]fi[Ss]pace|NADDOD|FSCOM|(VERTIV )?[Aa]vocent|[Oo]pen[Gg]ear)",

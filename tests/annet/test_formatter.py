@@ -578,6 +578,37 @@ def test_nokia_parse_to_tree(nokia_config_info, nokia_config):
     assert parse_to_tree(nokia_config_info, formatter.split) == parsed
 
 
+def test_nokia_parse_lists():
+    """Empty list entries and leaf-lists in admin show configuration output"""
+    formatter = registry_connector.get().match(make_hw_stub("nokia")).make_formatter()
+    config = textwrap.dedent("""
+        configure {
+            policy-options {
+                prefix-list "pl" {
+                    prefix 10.0.0.0/8 type exact { }
+                }
+            }
+            router "Base" {
+                bgp {
+                    group "ebgp" {
+                        import {
+                            policy ["p1" "p2"]
+                        }
+                    }
+                }
+            }
+        }
+
+        persistent-indices {
+            description "Persistent indices are maintained by the system and must not be modified."
+        }
+    """)
+    assert parse_to_tree(config, formatter.split) == {
+        "policy-options": {'prefix-list "pl"': {"prefix 10.0.0.0/8 type exact": {}}},
+        'router "Base"': {"bgp": {'group "ebgp"': {"import": {'policy ["p1" "p2"]': {}}}}},
+    }
+
+
 def test_aruba_parse_to_tree(aruba_config):
     """An aruba config obtained via configure read-only; info | no-more"""
     expected = {

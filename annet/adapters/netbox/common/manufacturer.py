@@ -48,4 +48,6 @@ def get_breed(manufacturer: str, model: str) -> str:
         return "aruos"
     elif hw.Sitonica:
         return "ipn"
+    elif hw.Nokia:
+        return "sros"
     return ""

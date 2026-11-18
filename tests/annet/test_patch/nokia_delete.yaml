@@ -1,0 +1,85 @@
+# leaf value change is a plain set, leaf removal is "delete <leaf>" without a value
+- vendor: Nokia
+  before: |
+    system {
+        name "old"
+        location "dc 1"
+    }
+  after: |
+    system {
+        name "new"
+    }
+  patch: |
+    configure private
+    delete /configure system location
+    /configure system name "new"
+    commit
+    quit-config
+
+- vendor: Nokia
+  before: |
+    system {
+        name "old"
+    }
+  after: |
+    system {
+    }
+  patch: |
+    configure private
+    delete /configure system name
+    commit
+    quit-config
+
+# list entries are deleted by their keys
+- vendor: Nokia
+  before: |
+    router "Base" {
+        interface "to-r2" {
+            description "x"
+            ipv4 {
+                primary {
+                    address 10.0.0.1
+                    prefix-length 31
+                }
+            }
+        }
+        interface "to-r3" { }
+    }
+  after: |
+    router "Base" {
+        interface "to-r2" {
+            ipv4 {
+                primary {
+                    address 10.0.0.3
+                    prefix-length 31
+                }
+            }
+        }
+    }
+  patch: |
+    configure private
+    delete /configure router "Base" interface "to-r2" description
+    delete /configure router "Base" interface "to-r3"
+    /configure router "Base" interface "to-r2" ipv4 primary address 10.0.0.3
+    commit
+    quit-config
+
+- vendor: Nokia
+  before: |
+    policy-options {
+        prefix-list "pl" {
+            prefix 10.0.0.0/8 type exact { }
+            prefix 10.1.0.0/16 type exact { }
+        }
+    }
+  after: |
+    policy-options {
+        prefix-list "pl" {
+            prefix 10.0.0.0/8 type exact { }
+        }
+    }
+  patch: |
+    configure private
+    delete /configure policy-options prefix-list "pl" prefix 10.1.0.0/16 type exact
+    commit
+    quit-config

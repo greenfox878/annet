@@ -1,0 +1,46 @@
+# leaf-list is replaced as a whole to keep the user-defined order
+- vendor: Nokia
+  before: |
+    router "Base" {
+        bgp {
+            group "ebgp" {
+                import {
+                    policy ["p1" "p2"]
+                }
+            }
+        }
+    }
+  after: |
+    router "Base" {
+        bgp {
+            group "ebgp" {
+                import {
+                    policy ["p1" "p3"]
+                }
+            }
+        }
+    }
+  patch: |
+    configure private
+    delete /configure router "Base" bgp group "ebgp" import policy
+    /configure router "Base" bgp group "ebgp" import policy ["p1" "p3"]
+    commit
+    quit-config
+
+- vendor: Nokia
+  before: ""
+  after: |
+    router "Base" {
+        bgp {
+            group "ebgp" {
+                import {
+                    policy ["p1" "p2"]
+                }
+            }
+        }
+    }
+  patch: |
+    configure private
+    /configure router "Base" bgp group "ebgp" import policy ["p1" "p2"]
+    commit
+    quit-config
