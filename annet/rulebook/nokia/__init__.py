@@ -1,4 +1,3 @@
-import shlex
 from collections import OrderedDict as odict
 from collections.abc import Callable
 from typing import Any
@@ -11,17 +10,6 @@ def _name(row: str) -> str:
     return row.split(maxsplit=1)[0]
 
 
-def _is_leaf_list(row: str) -> bool:
-    return row.rstrip().endswith("]")
-
-
-def _is_name_value(row: str) -> bool:
-    try:
-        return len(shlex.split(row)) == 2
-    except ValueError:
-        return False
-
-
 def _count_names(cfg: odict[str, Any]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for row in cfg:
@@ -32,8 +20,9 @@ def _count_names(cfg: odict[str, Any]) -> dict[str, int]:
 
 def leaf_deletes(diff_foo: Callable[..., list[common.DiffItem]]) -> Callable[..., list[common.DiffItem]]:
     """
-    MD-CLI deletes a leaf (or a whole leaf-list) by its name only: "delete /configure system location",
-    and setting a leaf overwrites its value, so "name old" -> "name new" needs no delete at all.
+    MD-CLI deletes a leaf (or a whole leaf-list) by its name only: "delete /configure system location".
+    A leaf value change "name old" -> "name new" is shown as removed/added rows (like "no hostname"/"hostname"
+    on other vendors) and becomes "delete <leaf>" followed by the set, both applied in one commit.
 
     After parsing, a leaf ("name value") and a single-key list entry without children ("interface "x" { }")
     look the same. So a childless row is shortened to its name only if this name is unique in the old block:
@@ -45,10 +34,9 @@ def leaf_deletes(diff_foo: Callable[..., list[common.DiffItem]]) -> Callable[...
     ) -> list[common.DiffItem]:
         diff = diff_foo(old, new, diff_pre, *args, **kwargs)
         old_names = _count_names(old)
-        new_names = _count_names(new)
-        new_childless = {_name(row): row for row in new if not new[row]}
 
         ret = []
+        deletes: dict[str, common.DiffItem] = {}
         for item in diff:
             row = item.row
             if item.op != Op.REMOVED or old.get(row) or old_names.get(_name(row)) != 1:
@@ -58,21 +46,19 @@ def leaf_deletes(diff_foo: Callable[..., list[common.DiffItem]]) -> Callable[...
             if name == row.strip():
                 ret.append(item)
                 continue
-            replacement = new_childless.get(name)
-            if (
-                replacement is not None
-                and new_names.get(name) == 1
-                and not _is_leaf_list(row)
-                and not _is_leaf_list(replacement)
-                and _is_name_value(row)
-                and _is_name_value(replacement)
-            ):
-                # leaf value change - the set command overwrites it
-                continue
             attrs = dict(item.diff_pre["attrs"], reverse="delete {}")
-            diff_pre_match = dict(item.diff_pre, key=(name,), attrs=attrs)
-            ret.append(common.DiffItem(item.op, name, item.children, diff_pre_match))
-        return ret
+            # own pseudo-rule: make_pre groups by raw_rule and takes attrs from the first item,
+            # so the added row with the new value would otherwise impose the rule's reverse
+            diff_pre_match = dict(item.diff_pre, raw_rule=name, rule=name, key=(name,), attrs=attrs)
+            deletes[name] = common.DiffItem(item.op, row, item.children, diff_pre_match)
+
+        # show the old value right before the new one: "- name old", "+ name new"
+        ordered = []
+        for item in ret:
+            if item.op == Op.ADDED and (delete := deletes.pop(_name(item.row), None)):
+                ordered.append(delete)
+            ordered.append(item)
+        return [*deletes.values(), *ordered]
 
     return wrapper
 

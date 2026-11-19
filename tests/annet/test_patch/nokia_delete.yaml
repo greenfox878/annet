@@ -1,4 +1,4 @@
-# leaf value change is a plain set, leaf removal is "delete <leaf>" without a value
+# leaf removal is "delete <leaf>" without a value, leaf value change is delete + set (like "no x" + "x")
 - vendor: Nokia
   before: |
     system {
@@ -12,6 +12,7 @@
   patch: |
     configure private
     delete /configure system location
+    delete /configure system name
     /configure system name "new"
     commit
     quit-config
@@ -59,6 +60,7 @@
   patch: |
     configure private
     delete /configure router "Base" interface "to-r2" description
+    delete /configure router "Base" interface "to-r2" ipv4 primary address
     delete /configure router "Base" interface "to-r3"
     /configure router "Base" interface "to-r2" ipv4 primary address 10.0.0.3
     commit
