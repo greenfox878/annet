@@ -10,7 +10,7 @@
         name "new"
     }
   patch: |
-    configure private
+    edit-config private
     delete /configure system location
     delete /configure system name
     /configure system name "new"
@@ -26,7 +26,7 @@
     system {
     }
   patch: |
-    configure private
+    edit-config private
     delete /configure system name
     commit
     quit-config
@@ -58,7 +58,7 @@
         }
     }
   patch: |
-    configure private
+    edit-config private
     delete /configure router "Base" interface "to-r2" description
     delete /configure router "Base" interface "to-r2" ipv4 primary address
     delete /configure router "Base" interface "to-r3"
@@ -81,7 +81,7 @@
         }
     }
   patch: |
-    configure private
+    edit-config private
     delete /configure policy-options prefix-list "pl" prefix 10.1.0.0/16 type exact
     commit
     quit-config

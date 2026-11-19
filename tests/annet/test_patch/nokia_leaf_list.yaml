@@ -21,7 +21,7 @@
         }
     }
   patch: |
-    configure private
+    edit-config private
     delete /configure router "Base" bgp group "ebgp" import policy
     /configure router "Base" bgp group "ebgp" import policy ["p1" "p3"]
     commit
@@ -40,7 +40,7 @@
         }
     }
   patch: |
-    configure private
+    edit-config private
     /configure router "Base" bgp group "ebgp" import policy ["p1" "p2"]
     commit
     quit-config

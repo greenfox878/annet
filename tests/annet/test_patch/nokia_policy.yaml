@@ -39,7 +39,7 @@
         }
     }
   patch: |
-    configure private
+    edit-config private
     /configure policy-options policy-statement "export" entry 20 from prefix-list ["pl"]
     /configure policy-options policy-statement "export" entry 20 action action-type accept
     commit

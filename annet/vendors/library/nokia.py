@@ -16,7 +16,7 @@ class NokiaVendor(AbstractVendor):
     ) -> tuple[CommandList, CommandList]:
         before, after = CommandList(), CommandList()
 
-        before.add_cmd(Command("configure private"))
+        before.add_cmd(Command("edit-config private"))
         if do_commit:
             after.add_cmd(Command("commit", timeout=30, read_timeout=30))
         after.add_cmd(Command("quit-config"))
